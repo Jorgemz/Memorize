@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  EmojiMemoryGameView.swift
 //  Memorize
 //
 //  Created by JG on 25/09/23.
@@ -7,57 +7,29 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct EmojiMemoryGameView: View {
+
+   var viewModel: EmojiMemoryGame
 
    let emojis = ["👻", "🎃", "🕷️", "👿", "💀", "❄️", "🧙🏻", "🙀", "👹", "😱", "☠️", "🍭"]
-   @State var cardCount = 4
 
    var body: some View {
-      VStack{
-         ScrollView {
-            cards
-         }
-         Spacer()
-         cardCountAdjusters
+      ScrollView {
+         cards
       }
       .padding()
   }
 
    var cards: some View {
       LazyVGrid(columns: [GridItem(.adaptive(minimum: 120 ))]) {
-         ForEach(0..<cardCount, id: \.self) { index in
+         ForEach(emojis.indices, id: \.self) { index in
             CardView(content: emojis[index])
                .aspectRatio(2/3, contentMode: .fit)
          }
       }
-      .foregroundStyle(.orange)
+      .foregroundStyle(Color.orange)
    }
 
-   var cardCountAdjusters: some View {
-      HStack {
-         cardRemover
-         .labelsHidden()
-         Spacer()
-         cardAdder
-      }
-      .imageScale(.large)
-      .font(.largeTitle)
-   }
-
-   func cardCounAdjuster(by offset: Int, symbol: String) -> some View {
-      Button("", systemImage: symbol) {
-            cardCount += offset
-      }
-      .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
-   }
-
-   var cardRemover: some View {
-      cardCounAdjuster(by: -1, symbol: "rectangle.stack.badge.minus.fill")
-   }
-
-   var cardAdder: some View {
-      cardCounAdjuster(by: +1, symbol: "rectangle.stack.badge.plus.fill")
-   }
 }
 
 struct CardView: View {
@@ -83,7 +55,7 @@ struct CardView: View {
 }
 
 #Preview {
-    ContentView()
+   EmojiMemoryGameView(viewModel: <#EmojiMemoryGame#>)
 }
 
 import os.log
