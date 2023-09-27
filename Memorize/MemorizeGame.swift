@@ -10,6 +10,7 @@ import Foundation
 struct MemoryGame<CardContent> where CardContent: Equatable {
 
    private(set) var cards: Array<Card>
+   private(set) var score = 0
 
    init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
       cards = []
@@ -27,19 +28,27 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
    }
 
    mutating func choose(_ card: Card) {
-      if let chooseIndex = cards.firstIndex(where: { $0.id == card.id }) {
-         if !cards[chooseIndex].isFaceUp && !cards[chooseIndex].isMatched {
+      if let choosenIndex = cards.firstIndex(where: { $0.id == card.id }) {
+         if !cards[choosenIndex].isFaceUp && !cards[choosenIndex].isMatched {
 
             if let potencialMatchIndex = indexOfTheOneOnlyFaceCard {
-               if cards[chooseIndex].content == cards[potencialMatchIndex].content {
-                  cards[chooseIndex].isMatched = true
+               if cards[choosenIndex].content == cards[potencialMatchIndex].content {
+                  cards[choosenIndex].isMatched = true
                   cards[potencialMatchIndex].isMatched = true
+                  score += 2
+               } else {
+                  if cards[choosenIndex].hasBeenSeen {
+                     score -= 1
+                  }
+                  if cards[potencialMatchIndex].hasBeenSeen {
+                     score -= 1
+                  }
                }
             } else {
-               indexOfTheOneOnlyFaceCard = chooseIndex
+               indexOfTheOneOnlyFaceCard = choosenIndex
             }
 
-            cards[chooseIndex].isFaceUp = true
+            cards[choosenIndex].isFaceUp = true
          }
       }
    }
@@ -51,7 +60,14 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
 
    struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
 
-      var isFaceUp = true
+      var isFaceUp = false {
+         didSet {
+            if oldValue == true && !isFaceUp {
+               hasBeenSeen = true
+            }
+         }
+      }
+      var hasBeenSeen = false
       var isMatched = false
       let content: CardContent
 
